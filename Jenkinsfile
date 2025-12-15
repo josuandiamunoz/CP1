@@ -2,14 +2,6 @@ pipeline {
     agent any
 
      stages {
-        stage('Get Code') {
-            steps {
-                // Obtener código del repo
-                git 'https://github.com/josuandiamunoz/CP1.git.git'
-                bat 'dir'
-                echo WORKSPACE
-            }
-        }
     
         stage('Build') {
            steps {
