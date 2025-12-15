@@ -5,8 +5,8 @@ pipeline {
     
         stage('Build') {
            steps {
-				whoami
-				hostname
+				bat 'whoami'
+				bat 'hostname'
 				echo WORKSPACE
                 echo 'Esto es python. No hay que compilar.'
 
@@ -21,8 +21,8 @@ pipeline {
 
                 stage('Unit') {
 					steps {
-						whoami
-						hostname
+						bat 'whoami'
+						bat 'hostname'
 						echo WORKSPACE
 						catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 							bat '''
@@ -36,8 +36,8 @@ pipeline {
                         
                 stage('Rest') {
                     steps {
-						whoami
-						hostname
+						bat 'whoami'
+						bat 'hostname'
 						echo WORKSPACE
                         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                             bat '''
@@ -55,8 +55,8 @@ pipeline {
         
         stage ('Results') {
             steps {
-				whoami
-				hostname
+				bat 'whoami'
+				bat 'hostname'
 				echo WORKSPACE
                 junit 'result*.xml'
             }
