@@ -5,8 +5,11 @@ pipeline {
     
         stage('Build') {
            steps {
+				whoami
+				hostname
+				echo WORKSPACE
                 echo 'Esto es python. No hay que compilar.'
-                echo WORKSPACE
+
                 bat 'dir'
            }
         }
@@ -18,6 +21,9 @@ pipeline {
 
                 stage('Unit') {
 					steps {
+						whoami
+						hostname
+						echo WORKSPACE
 						catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 							bat '''
 								set PYTHONPATH=%WORKSPACE%
@@ -30,6 +36,9 @@ pipeline {
                         
                 stage('Rest') {
                     steps {
+						whoami
+						hostname
+						echo WORKSPACE
                         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                             bat '''
 								set FLASK_APP=app\\api.py
@@ -46,6 +55,9 @@ pipeline {
         
         stage ('Results') {
             steps {
+				whoami
+				hostname
+				echo WORKSPACE
                 junit 'result*.xml'
             }
         }        
