@@ -9,6 +9,7 @@ pipeline {
                 // Obtener código del repo
                 git 'https://github.com/josuandiamunoz/CP1.git'
 	            echo WORKSPACE
+				echo "NODE_NAME = ${env.NODE_NAME}"
                 bat 'dir'
                 stash name:'code', includes:'**'
             }
@@ -19,6 +20,7 @@ pipeline {
 				bat 'whoami'
 				bat 'hostname'
 				echo WORKSPACE
+				echo "NODE_NAME = ${env.NODE_NAME}"
                 echo 'Esto es python. No hay que compilar.'
 
                 bat 'dir'
@@ -35,6 +37,7 @@ pipeline {
 						bat 'whoami'
 						bat 'hostname'
 						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
 						catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 							bat '''
 								set PYTHONPATH=%WORKSPACE%
@@ -50,6 +53,7 @@ pipeline {
 						bat 'whoami'
 						bat 'hostname'
 						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
                         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                             bat '''
 								set FLASK_APP=app\\api.py
@@ -69,6 +73,7 @@ pipeline {
 				bat 'whoami'
 				bat 'hostname'
 				echo WORKSPACE
+				echo "NODE_NAME = ${env.NODE_NAME}"
                 junit 'result*.xml'
             }
         }        
