@@ -5,6 +5,7 @@ pipeline {
      stages {
     
 		stage('Get Code') {
+			agent {label 'windows'}
             steps {
                 // Obtener código del repo
                 git 'https://github.com/josuandiamunoz/CP1.git'
@@ -16,6 +17,7 @@ pipeline {
         }
 		
         stage('Build') {
+		agent {label 'windows'}
            steps {
 				bat 'whoami'
 				bat 'hostname'
