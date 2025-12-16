@@ -1,8 +1,19 @@
 pipeline {
     agent any
+	options { skipDefaultCheckout() }
 
      stages {
     
+		stage('Get Code') {
+            steps {
+                // Obtener código del repo
+                git 'https://github.com/josuandiamunoz/CP1.git'
+	            echo WORKSPACE
+                bat 'dir'
+                stash name:'code', includes:'**'
+            }
+        }
+		
         stage('Build') {
            steps {
 				bat 'whoami'
