@@ -63,7 +63,7 @@ pipeline {
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								unstash name:'code'
 								sh '''
-									set FLASK_APP=app\\api.py
+									export FLASK_APP=app/api.py
 									start flask run
 									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock
 									export PYTHONPATH=${WORKSPACE}
