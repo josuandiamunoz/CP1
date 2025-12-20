@@ -64,8 +64,10 @@ pipeline {
 								unstash name:'code'
 								sh '''
 									export FLASK_APP=app/api.py
-									start flask run
-									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock
+									flask run &
+									sleep 4
+									java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock &
+									sleep 15
 									export PYTHONPATH=${WORKSPACE}
 									pytest --junitxml=result-rest.xml test/rest
 								'''
