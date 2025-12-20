@@ -37,13 +37,13 @@ pipeline {
                 stage('Unit') {
 					agent {label 'ubuntu1'}
 					steps {
-							bat 'whoami'
-							bat 'hostname'
+							sh 'whoami'
+							sh 'hostname'
 							echo WORKSPACE
 							echo "NODE_NAME = ${env.NODE_NAME}"
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								unstash name:'code'
-								bat '''
+								sh '''
 									set PYTHONPATH=%WORKSPACE%
 									pytest --junitxml=result-unit.xml test\\unit
 								'''
@@ -56,13 +56,13 @@ pipeline {
                 stage('Rest') {
 					agent {label 'ubuntu2'}
                     steps {
-							bat 'whoami'
-							bat 'hostname'
+							sh 'whoami'
+							sh 'hostname'
 							echo WORKSPACE
 							echo "NODE_NAME = ${env.NODE_NAME}"
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								unstash name:'code'
-								bat '''
+								sh '''
 									set FLASK_APP=app\\api.py
 									start flask run
 									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test\\wiremock
