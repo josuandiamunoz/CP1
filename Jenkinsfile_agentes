@@ -44,7 +44,7 @@ pipeline {
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								unstash name:'code'
 								sh '''
-									set PYTHONPATH=%WORKSPACE%
+									export PYTHONPATH=${WORKSPACE}
 									pytest --junitxml=result-unit.xml test/unit
 								'''
 								stash name:'unit-res', includes:'result-unit.xml'
@@ -66,7 +66,7 @@ pipeline {
 									set FLASK_APP=app\\api.py
 									start flask run
 									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock
-									set PYTHONPATH=%WORKSPACE%
+									export PYTHONPATH=${WORKSPACE}
 									pytest --junitxml=result-rest.xml test/rest
 								'''
 								stash name:'rest-res', includes:'result-res.xml'
