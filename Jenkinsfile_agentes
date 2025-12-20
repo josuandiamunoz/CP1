@@ -45,7 +45,7 @@ pipeline {
 								unstash name:'code'
 								sh '''
 									set PYTHONPATH=%WORKSPACE%
-									pytest --junitxml=result-unit.xml test\\unit
+									pytest --junitxml=result-unit.xml test/unit
 								'''
 								stash name:'unit-res', includes:'result-unit.xml'
 							}
@@ -65,9 +65,9 @@ pipeline {
 								sh '''
 									set FLASK_APP=app\\api.py
 									start flask run
-									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test\\wiremock
+									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock
 									set PYTHONPATH=%WORKSPACE%
-									pytest --junitxml=result-rest.xml test\\rest
+									pytest --junitxml=result-rest.xml test/rest
 								'''
 								stash name:'rest-res', includes:'result-res.xml'
                         }
