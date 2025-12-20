@@ -17,7 +17,7 @@ pipeline {
         }
 		
         stage('Build') {
-		agent {label 'windows'}
+			agent {label 'windows'}
            steps {
 				bat 'whoami'
 				bat 'hostname'
@@ -35,35 +35,41 @@ pipeline {
             {
 
                 stage('Unit') {
+					agent {label 'ubuntu1'}
 					steps {
-						bat 'whoami'
-						bat 'hostname'
-						echo WORKSPACE
-						echo "NODE_NAME = ${env.NODE_NAME}"
-						catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-							bat '''
-								set PYTHONPATH=%WORKSPACE%
-								pytest --junitxml=result-unit.xml test\\unit
-							'''
-						}
+							bat 'whoami'
+							bat 'hostname'
+							echo WORKSPACE
+							echo "NODE_NAME = ${env.NODE_NAME}"
+							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+								unstash name:'code'
+								bat '''
+									set PYTHONPATH=%WORKSPACE%
+									pytest --junitxml=result-unit.xml test\\unit
+								'''
+								stash name:'unit-res', includes:'result-unit.xml'
+							}
 					}
                 }
                 
                         
                 stage('Rest') {
+					agent {label 'ubuntu2'}
                     steps {
-						bat 'whoami'
-						bat 'hostname'
-						echo WORKSPACE
-						echo "NODE_NAME = ${env.NODE_NAME}"
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                            bat '''
-								set FLASK_APP=app\\api.py
-								start flask run
-								start java -jar C:\\Users\\josu\\Desktop\\unir\\wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test\\wiremock
-								set PYTHONPATH=%WORKSPACE%
-								pytest --junitxml=result-rest.xml test\\rest
-                            '''
+							bat 'whoami'
+							bat 'hostname'
+							echo WORKSPACE
+							echo "NODE_NAME = ${env.NODE_NAME}"
+							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+								unstash name:'code'
+								bat '''
+									set FLASK_APP=app\\api.py
+									start flask run
+									start java -jar /home/jenkins/descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test\\wiremock
+									set PYTHONPATH=%WORKSPACE%
+									pytest --junitxml=result-rest.xml test\\rest
+								'''
+								stash name:'rest-res', includes:'result-res.xml'
                         }
                     }
                 }        
@@ -76,6 +82,8 @@ pipeline {
 				bat 'hostname'
 				echo WORKSPACE
 				echo "NODE_NAME = ${env.NODE_NAME}"
+				unstash name:'unit-res'
+				unstash name:'rest-res'
                 junit 'result*.xml'
             }
         }        
