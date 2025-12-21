@@ -8,7 +8,7 @@ pipeline {
 			agent {label 'windows'}
             steps {
                 // Obtener código del repo
-                git 'https://github.com/josuandiamunoz/CP1.git'
+                git branch: 'develop', url: 'https://github.com/repo/proyecto.git'
 	            echo WORKSPACE
 				echo "NODE_NAME = ${env.NODE_NAME}"
                 bat 'dir'
