@@ -63,7 +63,6 @@ pipeline {
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								unstash name:'code'
 								sh '''
-									. venv/bin/activate
 									export FLASK_APP=app/api.py
 									flask run &
 									sleep 4
