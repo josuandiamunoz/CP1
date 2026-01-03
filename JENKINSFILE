@@ -16,12 +16,12 @@ pipeline {
 
                 stage('Unit') {
 					steps {
-						catchError(stageResult: 'SUCCESS') {
-							bat '''
-								set PYTHONPATH=%WORKSPACE%
-								pytest --junitxml=result-unit.xml test\\unit
-							'''
-						}
+						bat '''
+							set PYTHONPATH=%WORKSPACE%
+							pytest --junitxml=result-unit.xml test\\unit
+							IF %ERRORLEVEL% EQU 1 EXIT /B 0
+							IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+						'''
 					}
                 }
                 
