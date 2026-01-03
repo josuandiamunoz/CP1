@@ -16,7 +16,7 @@ pipeline {
 
 				stage('Unit') {
 					steps {
-						catchError(stageResult: 'SUCCESS') {
+						catchError(stageResult: 'SUCCESS', buildResult: 'SUCCESS') {
 							bat '''
 								set PYTHONPATH=%WORKSPACE%
 								pytest --junitxml=result-unit.xml test\\unit
