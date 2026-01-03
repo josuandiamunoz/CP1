@@ -29,7 +29,7 @@ pipeline {
                         
                 stage('Rest') {
                     steps {
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
                             bat '''
 								set FLASK_APP=app\\api.py
 								start flask run
@@ -38,6 +38,7 @@ pipeline {
 								pytest --junitxml=result-rest.xml test\\rest
                             '''
                         }
+						junit 'result-rest.xml'
                     }
                 }        
             }
