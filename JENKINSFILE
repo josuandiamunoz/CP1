@@ -16,22 +16,13 @@ pipeline {
 
 				stage('Unit') {
 					steps {
-						script {
-							// Ejecutar pytest
-							catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
-								bat '''
-									set PYTHONPATH=%WORKSPACE%
-									pytest --junitxml=result-unit.xml test\\unit
-								'''
-							}
-
-							// Ejecutar junit dentro de try/catch para que la stage quede verde
-							try {
-								junit 'result-unit.xml'
-							} catch (e) {
-								echo "Tests fallaron, pero mantenemos la stage verde"
-							}
+						catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+							bat '''
+								set PYTHONPATH=%WORKSPACE%
+								pytest --junitxml=result-unit.xml test\\unit
+							'''
 						}
+						junit 'result-unit.xml'
 					}
 				}
                 
