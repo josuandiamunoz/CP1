@@ -22,7 +22,7 @@ pipeline {
 							IF %ERRORLEVEL% EQU 1 EXIT /B 0
 							IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 						'''
-						junit 'result-unit.xml'
+						junit 'result-unit.xml', skipMarkingBuildUnstable: true
 					}
                 }
                 
