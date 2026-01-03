@@ -9,39 +9,32 @@ pipeline {
             }
         }
         
-        stage('Tests')
-        {
-            parallel
-            {
-
-				stage('Unit') {
-					steps {
-						catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
-							bat '''
-								set PYTHONPATH=%WORKSPACE%
-								pytest --junitxml=result-unit.xml test\\unit
-							'''
-						}
-						junit 'result-unit.xml'
-					}
+        stage('Unit') {
+			steps {
+				catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+					bat '''
+						set PYTHONPATH=%WORKSPACE%
+						pytest --junitxml=result-unit.xml test\\unit
+					'''
 				}
-                
-                        
-                stage('Rest') {
-                    steps {
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
-                            bat '''
-								set FLASK_APP=app\\api.py
-								start flask run
-								start java -jar C:\\Users\\josu\\Desktop\\unir\\wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test\\wiremock
-								set PYTHONPATH=%WORKSPACE%
-								pytest --junitxml=result-rest.xml test\\rest
-                            '''
-                        }
-						junit 'result-rest.xml'
-                    }
-                }        
-            }
-        }  
+				junit 'result-unit.xml'
+			}
+		}
+		
+				
+		stage('Rest') {
+			steps {
+				catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+					bat '''
+						set FLASK_APP=app\\api.py
+						start flask run
+						start java -jar C:\\Users\\josu\\Desktop\\unir\\wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test\\wiremock
+						set PYTHONPATH=%WORKSPACE%
+						pytest --junitxml=result-rest.xml test\\rest
+					'''
+				}
+				junit 'result-rest.xml'
+			}
+		} 
      }
 }
