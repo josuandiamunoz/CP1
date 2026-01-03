@@ -14,20 +14,22 @@ pipeline {
             parallel
             {
 
-                stage('Unit') {
+				stage('Unit') {
 					steps {
-						bat '''
-							set PYTHONPATH=%WORKSPACE%
-							pytest --junitxml=result-unit.xml test\\unit
-							IF %ERRORLEVEL% EQU 1 EXIT /B 0
-							IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
-						'''
-						junit(
-							testResults: 'result-unit.xml',
-							skipMarkingBuildUnstable: true
-						)
+						catchError(stageResult: 'SUCCESS') {
+							bat '''
+								set PYTHONPATH=%WORKSPACE%
+								pytest --junitxml=result-unit.xml test\\unit
+								IF %ERRORLEVEL% EQU 1 EXIT /B 0
+								IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+							'''
+							junit(
+								testResults: 'result-unit.xml',
+								skipMarkingBuildUnstable: true
+							)
+						}
 					}
-                }
+				}
                 
                         
                 stage('Rest') {
