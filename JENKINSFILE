@@ -21,8 +21,8 @@ pipeline {
 								set PYTHONPATH=%WORKSPACE%
 								pytest --junitxml=result-unit.xml test\\unit
 							'''
-							junit 'result-unit.xml'
 						}
+						junit 'result-unit.xml'
 					}
 				}
                 
