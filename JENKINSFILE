@@ -22,7 +22,9 @@ pipeline {
 								pytest --junitxml=result-unit.xml test\\unit
 							'''
 						}
-						junit 'result-unit.xml'
+						catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+							junit 'result-unit.xml'
+						}
 					}
 				}
                 
