@@ -2,6 +2,12 @@ pipeline {
     agent any
 
      stages {
+	 
+		stage('Get Code') {
+            steps {
+                git 'https://github.com/josuandiamunoz/CP1.git'
+            }
+        }
         
         stage('Tests')
         {
