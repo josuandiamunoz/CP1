@@ -16,14 +16,12 @@ pipeline {
 
 				stage('Unit') {
 					steps {
-						catchError(stageResult: 'SUCCESS') {
+						catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
 							bat '''
 								set PYTHONPATH=%WORKSPACE%
 								pytest --junitxml=result-unit.xml test\\unit
 							'''
-							junit(
-								testResults: 'result-unit.xml'
-							)
+							junit 'result-unit.xml'
 						}
 					}
 				}
