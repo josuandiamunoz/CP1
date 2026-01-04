@@ -53,6 +53,17 @@ pipeline {
 			}
 		}
 		
+		stage('Performance') {
+            steps {
+                bat '''
+                    set FLASK_APP=app\\api.py
+                    start flask run
+                    C:\\Users\\josu\\Desktop\\unir\\jmeter\\apache-jmeter-5.6.3\\bin\\jmeter -n -t "C:\\Users\\josu\\Desktop\\unir\\jmeter\\apache-jmeter-5.6.3\\bin\\Test_Rendimiento.jmx" -f -l flask.jtl
+                '''
+                perfReport sourceDataFiles: 'flask.jtl'
+            }
+        }
+		
 		stage('Test') {
             steps {
                 bat 'dir'
