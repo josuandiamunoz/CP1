@@ -1,93 +1,115 @@
 pipeline {
-    agent any
-	options { skipDefaultCheckout() }
-
-     stages {
-    
+	
+	stages {
+		
 		stage('Get Code') {
 			agent {label 'windows'}
             steps {
-                // Obtener código del repo
-                git 'https://github.com/josuandiamunoz/CP1.git'
-	            echo WORKSPACE
+				bat 'whoami'
+				bat 'hostname'
+				echo WORKSPACE
 				echo "NODE_NAME = ${env.NODE_NAME}"
-                bat 'dir'
-                stash name:'code', includes:'**'
+                git 'https://github.com/josuandiamunoz/CP1.git'
+				stash name:'code', includes:'**'
             }
+			post {
+				always {
+					deleteDir()
+				}
+			}
         }
 		
-        stage('Build') {
-			agent {label 'windows'}
-           steps {
-				bat 'whoami'
-				bat 'hostname'
-				echo WORKSPACE
-				echo "NODE_NAME = ${env.NODE_NAME}"
-                echo 'Esto es python. No hay que compilar.'
+		stage('Tests') {
+			parellel {
+				stage('Unit') {
+					agent {label 'windows'}
+					steps {
+						bat 'whoami'
+						bat 'hostname'
+						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
+						catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+							unstash name:'code'
+							bat '''
+								set PYTHONPATH=%WORKSPACE%
+								coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest --junitxml=result-unit.xml test\\unit
+								coverage xml -o coverage.xml
 
-                bat 'dir'
-           }
-        }
-        
-        stage('Tests')
-        {
-            parallel
-            {
-
-                stage('Unit') {
+							'''
+							stash name:'coverage', includes:'coverage.xml'
+						}
+						junit 'result-unit.xml'
+					}
+					post {
+						always {
+							deleteDir()
+						}
+					}
+				}
+				stage('Rest') {
 					agent {label 'ubuntu1'}
 					steps {
-							sh 'whoami'
-							sh 'hostname'
-							echo WORKSPACE
-							echo "NODE_NAME = ${env.NODE_NAME}"
-							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-								unstash name:'code'
-								sh '''
-									export PYTHONPATH=${WORKSPACE}
-									pytest --junitxml=result-unit.xml test/unit
-								'''
-								stash name:'unit-res', includes:'result-unit.xml'
-							}
+						sh 'whoami'
+						sh 'hostname'
+						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
+						catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+							unstash name:'code'
+							sh '''
+								export FLASK_APP=app/api.py
+								flask run &
+								sleep 4
+								java -jar /home/jenkins/Descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock &
+								sleep 15
+								export PYTHONPATH=${WORKSPACE}
+								pytest --junitxml=result-rest.xml test/rest
+							'''
+						}
+						junit 'result-rest.xml'
 					}
-                }
-                
-                        
-                stage('Rest') {
-					agent {label 'ubuntu2'}
-                    steps {
-							sh 'whoami'
-							sh 'hostname'
-							echo WORKSPACE
-							echo "NODE_NAME = ${env.NODE_NAME}"
-							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-								unstash name:'code'
-								sh '''
-									export FLASK_APP=app/api.py
-									flask run &
-									sleep 4
-									java -jar /home/jenkins/Descargas/wiremock-standalone-3.13.2.jar --port 9090 --verbose --root-dir test/wiremock &
-									sleep 15
-									export PYTHONPATH=${WORKSPACE}
-									pytest --junitxml=result-rest.xml test/rest
-								'''
-								stash name:'rest-res', includes:'result-rest.xml'
-                        }
-                    }
-                }        
-            }
-        }
-        
-        stage ('Results') {
-            steps {
+					post {
+						always {
+							deleteDir()
+						}
+					}
+				}
+				stage('Performance') {
+					agent {label 'windows'}
+					steps {
+						unstash name:'code'
+						bat '''
+							set FLASK_APP=app\\api.py
+							start flask run
+							C:\\Users\\josu\\Desktop\\unir\\jmeter\\apache-jmeter-5.6.3\\bin\\jmeter -n -t "C:\\Users\\josu\\Desktop\\unir\\jmeter\\apache-jmeter-5.6.3\\bin\\Test_Rendimiento.jmx" -f -l flask.jtl
+						'''
+						perfReport sourceDataFiles: 'flask.jtl'
+					}
+					post {
+						always {
+							deleteDir()
+						}
+					}
+				}
+			}
+		}
+		
+		stage ('Coverage') {
+			agent {label 'windows'}
+			steps {
 				bat 'whoami'
 				bat 'hostname'
 				echo WORKSPACE
 				echo "NODE_NAME = ${env.NODE_NAME}"
-				unstash name:'unit-res'
-				unstash name:'rest-res'
-                junit 'result*.xml'
-            }
-        }        
-     }
+				unstash name:'coverage'
+				recordCoverage qualityGates: [[criticality: 'NOTE', integerThreshold: 95, metric: 'LINE', threshold: 95.0], [criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0], [criticality: 'NOTE', integerThreshold: 90, metric: 'BRANCH', threshold: 90.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]
+			}
+			post {
+				always {
+					deleteDir()
+				}
+			}
+		}
+	
+	}
+	
 }
