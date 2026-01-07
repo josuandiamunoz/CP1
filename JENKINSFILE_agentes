@@ -63,6 +63,10 @@ pipeline {
 				stage ('Static'){
 					agent {label 'ubuntu2'}
 					steps{
+						sh 'whoami'
+						sh 'hostname'
+						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
 						unstash name:'code'
 						sh '''
 							flake8 --exit-zero --format=pylint app >flake8.out
@@ -74,6 +78,10 @@ pipeline {
 				stage('Security') {
 					agent {label 'ubuntu2'}
 					steps {
+						sh 'whoami'
+						sh 'hostname'
+						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
 						unstash name:'code'
 						sh '''
 							bandit --exit-zero -r . -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
@@ -85,6 +93,10 @@ pipeline {
 				stage('Performance') {
 					agent {label 'windows'}
 					steps {
+						bat 'whoami'
+						bat 'hostname'
+						echo WORKSPACE
+						echo "NODE_NAME = ${env.NODE_NAME}"
 						unstash name:'code'
 						bat '''
 							set FLASK_APP=app\\api.py
