@@ -14,11 +14,6 @@ pipeline {
                 git 'https://github.com/josuandiamunoz/CP1.git'
 				stash name:'code', includes:'**'
             }
-			post {
-				always {
-					deleteDir()
-				}
-			}
         }
 		
 		stage('Tests') {
@@ -42,11 +37,6 @@ pipeline {
 						}
 						junit 'result-unit.xml'
 					}
-					post {
-						always {
-							deleteDir()
-						}
-					}
 				}
 				stage('Rest') {
 					agent {label 'ubuntu1'}
@@ -69,11 +59,6 @@ pipeline {
 						}
 						junit 'result-rest.xml'
 					}
-					post {
-						always {
-							deleteDir()
-						}
-					}
 				}
 				stage('Performance') {
 					agent {label 'windows'}
@@ -85,11 +70,6 @@ pipeline {
 							C:\\Users\\josu\\Desktop\\unir\\jmeter\\apache-jmeter-5.6.3\\bin\\jmeter -n -t "C:\\Users\\josu\\Desktop\\unir\\jmeter\\apache-jmeter-5.6.3\\bin\\Test_Rendimiento.jmx" -f -l flask.jtl
 						'''
 						perfReport sourceDataFiles: 'flask.jtl'
-					}
-					post {
-						always {
-							deleteDir()
-						}
 					}
 				}
 			}
@@ -104,11 +84,6 @@ pipeline {
 				echo "NODE_NAME = ${env.NODE_NAME}"
 				unstash name:'coverage'
 				recordCoverage qualityGates: [[criticality: 'NOTE', integerThreshold: 95, metric: 'LINE', threshold: 95.0], [criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0], [criticality: 'NOTE', integerThreshold: 90, metric: 'BRANCH', threshold: 90.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]
-			}
-			post {
-				always {
-					deleteDir()
-				}
 			}
 		}
 	
