@@ -60,6 +60,15 @@ pipeline {
 						junit 'result-rest.xml'
 					}
 				}
+				stage ('Static'){
+					agent {label 'ubuntu2'}
+					steps{
+						bat '''
+							flake8 --exit-zero --format=pylint app >flake8.out
+						'''
+						recordIssues tools: [flake8(pattern: 'flake8.out')], qualityGates: [[threshold: 8.0, type: 'TOTAL', unstable: true], [threshold: 10.0, type: 'TOTAL', unstable: false]]
+					}
+				}
 				stage('Performance') {
 					agent {label 'windows'}
 					steps {
