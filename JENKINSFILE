@@ -72,12 +72,6 @@ pipeline {
                 perfReport sourceDataFiles: 'flask.jtl'
             }
         }
-		
-		stage('Test') {
-            steps {
-                bat 'dir'
-            }
-        }
 
      }
 }
