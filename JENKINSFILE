@@ -80,12 +80,4 @@ pipeline {
         }
 
      }
-	 
-	post { 
-		always { 
-			bat 'taskkill /F /IM python.exe /T || exit 0'
-			bat 'taskkill /F /IM java.exe /T || exit 0'
-			cleanWs()
-		}
-	}
 }
