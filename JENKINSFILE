@@ -5,7 +5,7 @@ pipeline {
 	 
 		stage('Get Code') {
             steps {
-                git 'https://github.com/josuandiamunoz/CP1.git'
+                git branch: 'feature_fix_coverage', url: 'https://github.com/josuandiamunoz/CP1.git'
             }
         }
         
